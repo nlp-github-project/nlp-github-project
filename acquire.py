@@ -28,6 +28,13 @@ REPOS = [
     "gocodeup/codeup-setup-script",
     "gocodeup/movies-application",
     "torvalds/linux",
+    "harthur/brain",
+    "google/agera",
+    "michaeltyson/TPKeyboardAvoiding",
+    "bendc/sprint",
+    "rengwuxian/RxJavaSamples",
+    "fastos/fastsocket",
+    "petruisfan/node-supervisor"
 ]
 
 headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}

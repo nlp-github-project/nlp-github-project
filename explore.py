@@ -47,3 +47,16 @@ def most_common_words(df):
     pd.Series(c_plus_plus_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words C++', figsize=(19,10), ax=axes[4])
 
     plt.tight_layout()
+
+def plot_word_count_distribution(df):
+    
+    def word_count(word):
+        word_count = len(re.findall(r'\w+', word))
+        return word_count
+
+    word_count = df.clean_lemmatized.apply(word_count)
+    df["word_count"] = word_count
+
+    plt.figure(figsize=(12,8))
+    sns.distplot(df.word_count)
+    plt.title("Word Count Distribution")

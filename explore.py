@@ -60,3 +60,49 @@ def plot_word_count_distribution(df):
     plt.figure(figsize=(12,8))
     sns.distplot(df.word_count)
     plt.title("Word Count Distribution")
+    
+    
+def plot_distro_for_value_counts_all(df):
+    """
+    Creates a bar graph for the value counts of the readmes for all languages
+    """
+    
+    c="#84aae2"
+    value_counts_all = pd.DataFrame(df.language.value_counts(ascending=False))
+    plt.figure(figsize=(13,10))
+    bar = sns.barplot(x=value_counts_all.index, y="language", data=value_counts_all, color = c)
+    bar.set_xticklabels(bar.get_xticklabels(),rotation=65)
+    bar.set_ylabel("counts")
+
+    plt.title("How is the data distributed per document for all languages?")
+    plt.show()
+    
+    
+def plot_distro_for_value_counts_top(df):
+    """
+    Creates a bar graph for the value counts of the readmes for top languages
+    """
+    c="#84aae2"
+    value_counts = pd.DataFrame(df.is_top_language.value_counts(ascending=False))
+    plt.figure(figsize=(13,10))
+    bar = sns.barplot(x=value_counts.index, y="is_top_language", data=value_counts, color = c)
+    bar.set_xticklabels(bar.get_xticklabels(),rotation=65)
+    bar.set_ylabel("counts")
+
+    plt.title("How is the data distributed per document for top languages?")
+    plt.show()
+    
+    
+def scatterplot_for_readmes(df):
+    """creates a scatterplot of the readmes and their lengths"""
+    #look at the lengths per readme so we can compare by language
+    df_length = df.assign(length = df.clean_lemmatized.apply(len))
+
+    plt.figure(figsize=(13,10))
+    ax = plt.subplot(111)
+
+    plt.title("What are the lengths of readme files per programming language?")
+    sns.scatterplot(y=df_length.length, x=df_length.index,hue=df_length.language)
+
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), shadow=True, ncol=2)
+    plt.show()

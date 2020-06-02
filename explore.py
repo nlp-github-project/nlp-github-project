@@ -16,6 +16,7 @@ import pandas as pd
 import nltk
 import nltk.sentiment
 import re
+from wordcloud import WordCloud
 
 
 def most_common_words(df):
@@ -106,3 +107,192 @@ def scatterplot_for_readmes(df):
 
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.1), shadow=True, ncol=2)
     plt.show()
+    
+    
+def bargraphs_for_min_max_median(df):
+    
+    """
+    Creates a bargraph for readme counts per language for the following:
+    min, max, and median
+    """
+    df_length = df.assign(length = df.clean_lemmatized.apply(len))
+
+    median_lengths = df_length.groupby("language").median().sort_values(by="length", ascending= False)
+    max_length = pd.DataFrame(df_length.groupby("language").length.max().sort_values(ascending= False))
+    min_length = pd.DataFrame(df_length.groupby("language").length.min().sort_values(ascending= False))
+
+
+    c="#84aae2"
+    plt.figure(figsize=(13,10))
+    plt.title("What is the median length of readme files per language?")
+    bar = sns.barplot(y=median_lengths.length,x=median_lengths.index, color=c)
+
+    bar.set_xticklabels(bar.get_xticklabels(),rotation=65)
+    plt.show()
+
+    plt.figure(figsize=(13,10))
+    plt.title("What is the minimum length of readme files per language?")
+    bar = sns.barplot(y=min_length.length,x=min_length.index, color=c)
+
+    bar.set_xticklabels(bar.get_xticklabels(),rotation=65)
+    plt.show()
+
+    plt.figure(figsize=(13,10))
+    plt.title("What is the maximum length of readme files per language?")
+    bar = sns.barplot(y=max_length.length,x=max_length.index, color=c)
+
+    bar.set_xticklabels(bar.get_xticklabels(),rotation=65)
+    plt.show()
+
+    
+def word_count(word):
+    """
+    returns the word count of readme
+    """
+    word_count = len(re.findall(r'\w+', word))
+    return word_count
+
+    
+def word_count_summary(df):
+    "returs a summary of the top language word counts"
+    df["word_count"] = df.clean_lemmatized.apply(word_count)
+    
+    min_word_count = pd.DataFrame(df.groupby("is_top_language").word_count.min())
+    min_word_count.columns = ['Min Word Count']
+
+    max_word_count = pd.DataFrame(df.groupby("is_top_language").word_count.max())
+    max_word_count.columns = ["Max Word Count"]
+
+    median_word_count = pd.DataFrame(df.groupby("is_top_language").word_count.median())
+    median_word_count.columns = ["Median Word Count"]
+
+    mean_word_count = pd.DataFrame(df.groupby("is_top_language").word_count.mean())
+    mean_word_count.columns = ["Mean Word Count"]
+
+    std_word_count = pd.DataFrame(df.groupby("is_top_language").word_count.std())
+    std_word_count.columns = ["STD of Word Count"]
+    
+    summary1 = pd.merge(min_word_count, max_word_count, left_index=True, right_index=True)
+    summary2 = pd.merge(median_word_count , mean_word_count , left_index=True, right_index=True)
+    summary3 = pd.merge(summary1 , summary2 , left_index=True, right_index=True)
+    summary = pd.merge(summary3 , std_word_count , left_index=True, right_index=True)
+    
+    return summary
+
+
+def list_of_words_for_top_languages(dfx, language="is_top_language", cleaned="clean_lemmatized"):
+    """Creates a list of words for each language in the top programming languages
+    returns in this order:
+    java script words, python words, java words, C++ words, other languages words, all words
+    """
+    # create list of words by language
+
+    js_words = ' '.join(dfx[dfx[language] == 'JavaScript'][cleaned]).split()
+    p_words = ' '.join(dfx[dfx[language] == 'Python'][cleaned]).split()
+    j_words = ' '.join(dfx[dfx[language] == 'Java'][cleaned]).split()
+    cpp_words = ' '.join(dfx[dfx[language] == 'C++'][cleaned]).split()
+    other_words = ' '.join(dfx[dfx[language] == 'other'][cleaned]).split()
+    all_words = ' '.join(dfx[cleaned]).split()
+    
+    return js_words, p_words, j_words, cpp_words, other_words, all_words
+
+def create_bigrams(df):
+    """returns a series of top 20 bigrams for each top language varible"""
+    
+    javascript_words, python_words, java_words, cpp_words, other_words, all_words = list_of_words_for_top_languages(df, language="is_top_language", cleaned="clean_lemmatized")
+
+    top_20_bigrams = (pd.Series(nltk.ngrams(all_words, 2))
+                      .value_counts()
+                      .head(20))
+
+    top_20_js_bigrams = (pd.Series(nltk.ngrams(javascript_words, 2))
+                      .value_counts()
+                      .head(20))
+
+    top_20_p_bigrams = (pd.Series(nltk.ngrams(python_words, 2))
+                      .value_counts()
+                      .head(20))
+
+    top_20_j_bigrams = (pd.Series(nltk.ngrams(java_words, 2))
+                      .value_counts()
+                      .head(20))
+
+    top_20_cpp_bigrams = (pd.Series(nltk.ngrams(cpp_words, 2))
+                      .value_counts()
+                      .head(20))
+
+    top_20_other_bigrams = (pd.Series(nltk.ngrams(other_words, 2))
+                      .value_counts()
+                      .head(20))
+    return top_20_bigrams, top_20_js_bigrams, top_20_p_bigrams, top_20_j_bigrams, top_20_cpp_bigrams, top_20_other_bigrams
+
+
+def plot_bigrams(df):
+    """
+    Plots the bigrams for the top 20 for each top language varible
+    """
+    
+    top_20_bigrams, top_20_js_bigrams, top_20_p_bigrams, top_20_j_bigrams, top_20_cpp_bigrams, top_20_other_bigrams= create_bigrams(df)
+    
+    c="#84aae2"
+
+    top_20_js_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13, 10))
+    plt.title('20 Most Frequently Occuring Java Script Bigrams')
+    plt.ylabel('Bigram')
+    plt.xlabel('# Occurences')
+    # make the labels pretty
+    ticks, _ = plt.yticks()
+    labels = top_20_js_bigrams.reset_index()['index'].apply(lambda t: t[0] + ' ' + t[1])
+    _ = plt.yticks(ticks, labels)
+    plt.show()
+
+
+    top_20_p_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13, 10))
+    plt.title('20 Most Frequently Occuring Python Bigrams')
+    plt.ylabel('Bigram')
+    plt.xlabel('# Occurences')
+    # make the labels pretty
+    ticks, _ = plt.yticks()
+    labels = top_20_p_bigrams.reset_index()['index'].apply(lambda t: t[0] + ' ' + t[1])
+    _ = plt.yticks(ticks, labels)
+    plt.show()
+
+    top_20_j_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13,10))
+    plt.title('20 Most Frequently Occuring Java Bigrams')
+    plt.ylabel('Bigram')
+    plt.xlabel('# Occurences')
+    # make the labels pretty
+    ticks, _ = plt.yticks()
+    labels = top_20_j_bigrams.reset_index()['index'].apply(lambda t: t[0] + ' ' + t[1])
+    _ = plt.yticks(ticks, labels)
+    plt.show()
+
+    top_20_cpp_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13,10))
+    plt.title('20 Most Frequently Occuring C++ Bigrams')
+    plt.ylabel('Bigram')
+    plt.xlabel('# Occurences')
+    # make the labels pretty
+    ticks, _ = plt.yticks()
+    labels = top_20_cpp_bigrams.reset_index()['index'].apply(lambda t: t[0] + ' ' + t[1])
+    _ = plt.yticks(ticks, labels)
+    plt.show()
+
+    top_20_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13,10))
+    plt.title('20 Most Frequently Occuring Bigrams')
+    plt.ylabel('Bigram')
+    plt.xlabel('# Occurences')
+    # make the labels pretty
+    ticks, _ = plt.yticks()
+    labels = top_20_bigrams.reset_index()['index'].apply(lambda t: t[0] + ' ' + t[1])
+    _ = plt.yticks(ticks, labels)
+    plt.show()
+    
+    
+def word_cloud(text):
+    """Creates a word cloud for a given text"""
+    plt.figure(figsize=(13, 13))
+
+    cloud = WordCloud(background_color='white', height=1000, width=1000).generate(' '.join(text))
+
+    plt.imshow(cloud)
+    plt.axis('off')

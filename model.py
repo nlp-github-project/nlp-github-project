@@ -92,8 +92,8 @@ def prepare_data(df):
 
 # _____ Main Preprocessing Function ____ #
 
-def preprocessing(data_representation, target_variable, ngram_range = (2,2)):
-    df = acquire_data()
+def preprocessing(df, data_representation, target_variable, ngram_range = (2,2)):
+    
     df = prepare_data(df)
 
     if data_representation == "bag_of_words":
@@ -157,6 +157,8 @@ def run_lg(X_train, y_train):
     y_pred = logit.predict(X_train)
     return logit, y_pred
 
+# Evaluation
+
 def create_report(y_train, y_pred):
     '''
     Helper function used to create a classification evaluation report, and return it as df
@@ -178,3 +180,27 @@ def accuracy_report(model, y_pred, y_train):
     matrix = pd.DataFrame(confusion_matrix(y_train, y_pred), index = labels, columns = labels)
 
     return accuracy_score, matrix, report
+
+# ------------------------- #
+#   Creating Prediction     #
+# ------------------------- #
+
+def predict_readme_language(readme):
+    df = acquire_data()
+    df = prepare_data(df)
+
+    tfidf = TfidfVectorizer()
+    X = tfidf.fit_transform(df.readme_contents.apply(clean).apply(' '.join)) 
+    y = df["is_top_language"]
+
+    X_train, X_validate, X_test, y_train, y_validate, y_test = split_data(X, y)
+    
+    clf, y_pred = run_clf(X_train, y_train, 5)
+    
+    text = prepare_data(readme)
+    
+    X = tfidf.transform(text.readme_contents.apply(clean).apply(' '.join))
+    
+    prediction = clf.predict(X)
+    
+    return prediction

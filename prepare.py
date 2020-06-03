@@ -98,7 +98,8 @@ def prepare_data(df):
     This function removes nan's from the language columns 
     Creates a new column called is_top_language
     """
-    df = df[(~df.readme_contents.str.contains("<p ")) & (~df.readme_contents.str.contains("<div "))].dropna()
+    
+    df = df[(~df.readme_contents.str.contains("<p ", na=False)) & (~df.readme_contents.str.contains("<div ", na=False))].dropna()
     df.loc[(df.language != "Python") & (df.language !="Java") & (df.language !="JavaScript") & (df.language !="C++"), 'is_top_language'] = 'other'
     df.is_top_language = df.is_top_language.fillna(df.language)
     return df

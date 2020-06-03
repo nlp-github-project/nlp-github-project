@@ -18,11 +18,16 @@ def basic_clean(df, col):
     returns the df with a new column named 'basic_clean' with the
     passed column text normalized.
     '''
+    df[col] = df[col].str.replace("\n", ' ')
+
     df['basic_clean'] = df[col].str.lower()\
                     .replace(r'[^\w\s]', '', regex=True)\
                     .str.normalize('NFKC')\
                     .str.encode('ascii', 'ignore')\
                     .str.decode('utf-8', 'ignore')
+    
+    
+
     return df
 
 
@@ -72,6 +77,17 @@ def remove_stopwords(df, col):
     
     return df
 
+def prepare_data(df):
+    """
+    This function removes nan's from the language columns 
+    Creates a new column called is_top_language
+    """
+    
+    df = df[(~df.readme_contents.str.contains("<p ", na=False)) & (~df.readme_contents.str.contains("<div ", na=False))].dropna()
+    df.loc[(df.language != "Python") & (df.language !="Java") & (df.language !="JavaScript") & (df.language !="C++"), 'is_top_language'] = 'other'
+    df.is_top_language = df.is_top_language.fillna(df.language)
+
+    return df
 
 def prep_readme_data(df):
     '''
@@ -93,14 +109,3 @@ def prep_readme_data(df):
     
     return df[['repo', 'language', 'readme_contents', 'clean_tokes', 'clean_lemmatized']]
 
-def prepare_data(df):
-    """
-    This function removes nan's from the language columns 
-    Creates a new column called is_top_language
-    """
-    
-    df = df[(~df.readme_contents.str.contains("<p ", na=False)) & (~df.readme_contents.str.contains("<div ", na=False))].dropna()
-    df.loc[(df.language != "Python") & (df.language !="Java") & (df.language !="JavaScript") & (df.language !="C++"), 'is_top_language'] = 'other'
-    df.is_top_language = df.is_top_language.fillna(df.language)
-
-    return df

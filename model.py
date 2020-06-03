@@ -198,19 +198,20 @@ def predict_readme_language(readme):
     df = acquire_data()
     df = prepare_data(df)
 
-    tfidf = TfidfVectorizer()
-    X = tfidf.fit_transform(df.readme_contents.apply(clean).apply(' '.join)) 
+
+    cv = CountVectorizer(ngram_range = (1,2))
+    X = cv.fit_transform(df.readme_contents.apply(clean).apply(' '.join))
     y = df["is_top_language"]
 
     X_train, X_validate, X_test, y_train, y_validate, y_test = split_data(X, y)
     
-    clf, y_pred = run_clf(X_train, y_train, 5)
-    
+    mnb = MultinomialNB(alpha = 0.7).fit(X_train, y_train)
+       
     text = prepare_data(readme)
     
-    X = tfidf.transform(text.readme_contents.apply(clean).apply(' '.join))
+    X = cv.transform(text.readme_contents.apply(clean).apply(' '.join))
     
-    prediction = clf.predict(X)
+    prediction = mnb.predict(X)
     
     return prediction
 

@@ -89,6 +89,20 @@ def prepare_data(df):
 
     return df
 
+
+def drop_long_words(string, num=12):
+    """
+    Takes in a string and drops words equal to or less than 
+    the number specified, defaults to 12
+    """
+    new_word = []
+    for word in string.split():
+        if len(word) <= num:
+            new_word.append(word)
+    new_word = " ".join(new_word)
+    return new_word
+
+
 def prep_readme_data(df):
     '''
     This function takes in the github readme df and

@@ -15,7 +15,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import export_graphviz
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.naive_bayes import MultinomialNB
 
 
 
@@ -158,6 +158,13 @@ def run_lg(X_train, y_train):
     logit = LogisticRegression().fit(X_train, y_train)
     y_pred = logit.predict(X_train)
     return logit, y_pred
+
+# Native Bayes Multinomial
+
+def run_native_bayes(X_train, y_train, alpha=.1):
+    mnb = MultinomialNB(alpha = alpha).fit(X_train, y_train)
+    y_pred = mnb.predict(X_train)
+    return mnb, y_pred
 
 # Evaluation
 

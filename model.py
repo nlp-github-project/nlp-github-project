@@ -82,12 +82,14 @@ def acquire_data():
     return df
 
 def prepare_data(df):
-    df = df[(~df.readme_contents.str.contains("<p ")) & (~df.readme_contents.str.contains("<div "))].dropna()
-
+    """
+    This function removes nan's from the language columns 
+    Creates a new column called is_top_language
+    """
+    
+    df = df[(~df.readme_contents.str.contains("<p ", na=False)) & (~df.readme_contents.str.contains("<div ", na=False))].dropna()
     df.loc[(df.language != "Python") & (df.language !="Java") & (df.language !="JavaScript") & (df.language !="C++"), 'is_top_language'] = 'other'
-
     df.is_top_language = df.is_top_language.fillna(df.language)
-
     return df
 
 # _____ Main Preprocessing Function ____ #
@@ -204,3 +206,23 @@ def predict_readme_language(readme):
     prediction = clf.predict(X)
     
     return prediction
+
+# -------------------------- # 
+#   Get Feature Importance   #
+# -------------------------- #
+
+def preprocessing_features(model):
+    
+    df = pd.read_json("data.json")
+    df = prepare_data(df)
+
+    tfidf = TfidfVectorizer()
+    X = tfidf.fit_transform(df.readme_contents.apply(clean).apply(' '.join)) 
+    
+
+    pd.Series(dict(zip(tfidf.get_feature_names(), model.feature_importances_))).sort_values().tail(5).plot.barh(title = "Most important words used for modeling", figsize=(10, 8))
+
+    
+    
+
+     

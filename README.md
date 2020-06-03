@@ -16,6 +16,10 @@ For this project, you will be scraping data from GitHub repository README files.
 * Python seemed to be the most verbose out of the programming languages
 
 ## How to Reproduce:
+- Have python installed through anaconda
+- You may need to install:
+    1. WordCloud
+    2. sentence tokenizer for nltk
 - First clone this repo
 - env.py file
 - Make a github personal access token.

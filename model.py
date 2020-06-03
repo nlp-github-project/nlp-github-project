@@ -73,8 +73,8 @@ def run_bag_of_ngrams(df, target_variable, ngram_range):
 # --------------- #
 
 def split_data(X, y, train_size=.75, random_state = 123):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_size, random_state=random_state)
-    X_train, X_validate, y_train, y_validate = train_test_split(X, y, train_size=train_size, random_state=random_state)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_size, random_state=random_state, stratify=y)
+    X_train, X_validate, y_train, y_validate = train_test_split(X, y, train_size=train_size, random_state=random_state, stratify=y)
     return X_train, X_validate, X_test, y_train, y_validate, y_test
 
 def acquire_data():

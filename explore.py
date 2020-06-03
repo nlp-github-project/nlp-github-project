@@ -16,7 +16,7 @@ import pandas as pd
 import nltk
 import nltk.sentiment
 import re
-# from wordcloud import WordCloud
+from wordcloud import WordCloud
 
 
 def clean(text: str, ADDITIONAL_STOPWORDS = ['r', 'u', '2', 'ltgt']) -> list:
@@ -179,6 +179,13 @@ def word_count(word):
     """
     word_count = len(re.findall(r'\w+', word))
     return word_count
+
+def digit_count(word):
+    """
+    returns the word count of readme
+    """
+    digit_count = len(re.findall(r'\d+', word))
+    return digit_count
 
     
 def word_count_summary(df):

@@ -16,6 +16,7 @@ from sklearn.tree import export_graphviz
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import MultinomialNB
+import prepare
 
 
 
@@ -96,7 +97,9 @@ def prepare_data(df):
 
 def preprocessing(df, data_representation, target_variable, ngram_range = (2,2)):
     
+    df = prepare.prep_readme_data(df)
     df = prepare_data(df)
+    
 
     if data_representation == "bag_of_words":
         X, y = run_bag_of_words(df, target_variable)
@@ -222,6 +225,7 @@ def predict_readme_language(readme):
 def preprocessing_features(model):
     
     df = pd.read_json("data.json")
+    df = prepare.prep_readme_data(df)
     df = prepare_data(df)
 
     tfidf = TfidfVectorizer()

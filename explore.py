@@ -37,6 +37,13 @@ def most_frequent_word(s: pd.Series) -> str:
     most_common_word = pd.Series(words).value_counts().head(1).index
     return most_common_word
 
+def most_frequent_bigram(s: pd.Series) -> str:
+    '''
+    Function that returns the most common bigram
+    '''
+    words = clean(' '.join(s))
+    most_common_bigram = pd.Series(nltk.bigrams(words)).value_counts().head(1).index
+    return most_common_bigram
 
 def most_common_words(df):
 
@@ -66,7 +73,7 @@ def most_common_words(df):
     pd.Series(javascript_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in JavaScript', figsize=(19,10), ax=axes[2])
     pd.Series(java_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words Java', figsize=(19,10), ax=axes[3])
     pd.Series(c_plus_plus_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words C++', figsize=(19,10), ax=axes[4])
-    pd.Series(other_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in other languages', figsize=(19,10), ax=axes[4])
+    pd.Series(other_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in other languages', figsize=(19,10), ax=axes[5])
 
     plt.tight_layout()
 
@@ -322,6 +329,10 @@ def word_cloud(text):
 
 def return_words_with_idf(words):
 
+    df = pd.read_json("data.json")
+    df = prepare.prep_readme_data(df)
+    df = prepare.prepare_data(df)
+    
     def idf(word):
         return  df.shape[0] / (1 + (df.clean_lemmatized.str.contains(word)).sum())
 
@@ -335,3 +346,19 @@ def return_words_with_idf(words):
     .head(5))
     
     return idf_df
+
+def calculate_idf_score(df):
+
+    df = pd.read_json("data.json")
+    df = prepare.prep_readme_data(df)
+    df = prepare.prepare_data(df)
+
+    languages = df.is_top_language.unique()
+    idf_scores = pd.DataFrame()
+    for language in languages:
+            words = clean(' '.join(df[df.is_top_language == language].clean_lemmatized))
+            idf_df = return_words_with_idf(words)
+            idf_df["language"] = language
+            
+            idf_scores = pd.concat([idf_scores, idf_df])
+    return idf_scores

@@ -109,6 +109,8 @@ def prep_readme_data(df):
     returns the df with original columns plus cleaned
     and lemmatized content without stopwords.
     '''
+
+    
     # Do basic clean on article content
     df = basic_clean(df, 'readme_contents')
     
@@ -120,6 +122,9 @@ def prep_readme_data(df):
     
     # Remove stopwords from Lemmatized article content
     df = remove_stopwords(df, 'lemmatized')
+
+    # Drop long strings
+    df.clean_lemmatized = df.clean_lemmatized.apply(drop_long_words)
     
     return df[['repo', 'language', 'readme_contents', 'clean_tokes', 'clean_lemmatized']]
 

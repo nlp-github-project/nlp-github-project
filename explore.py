@@ -16,7 +16,26 @@ import pandas as pd
 import nltk
 import nltk.sentiment
 import re
-from wordcloud import WordCloud
+# from wordcloud import WordCloud
+
+
+def clean(text: str, ADDITIONAL_STOPWORDS = ['r', 'u', '2', 'ltgt']) -> list:
+        'A simple function to cleanup text data'
+        wnl = nltk.stem.WordNetLemmatizer()
+        stopwords = nltk.corpus.stopwords.words('english') + ADDITIONAL_STOPWORDS
+        text = (text.encode('ascii', 'ignore')
+                .decode('utf-8', 'ignore')
+                .lower())
+        words = re.sub(r'[^\w\s]', '', text).split() # tokenization
+        return [wnl.lemmatize(word) for word in words if word not in stopwords]
+
+def most_frequent_word(s: pd.Series) -> str:
+    '''
+    Function that returns the most common word
+    '''
+    words = clean(' '.join(s))
+    most_common_word = pd.Series(words).value_counts().head(1).index
+    return most_common_word
 
 
 def most_common_words(df):
@@ -38,14 +57,16 @@ def most_common_words(df):
     javascript_words = clean(' '.join(df[df.language == 'JavaScript'].clean_lemmatized))
     java_words = clean(' '.join(df[df.language == 'Java'].clean_lemmatized))
     c_plus_plus_words = clean(' '.join(df[df.language == 'C++'].clean_lemmatized))
+    other_words = clean(' '.join(df[df.is_top_language == 'other'].clean_lemmatized))
 
-    figure, axes = plt.subplots(1, 5)
+    figure, axes = plt.subplots(1, 6)
 
     pd.Series(all_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in all README', figsize=(19,10), ax=axes[0])
     pd.Series(python_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in Python', figsize=(19,10), ax=axes[1])
     pd.Series(javascript_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in JavaScript', figsize=(19,10), ax=axes[2])
     pd.Series(java_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words Java', figsize=(19,10), ax=axes[3])
     pd.Series(c_plus_plus_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words C++', figsize=(19,10), ax=axes[4])
+    pd.Series(other_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in other languages', figsize=(19,10), ax=axes[4])
 
     plt.tight_layout()
 
@@ -296,3 +317,21 @@ def word_cloud(text):
 
     plt.imshow(cloud)
     plt.axis('off')
+
+
+
+def return_words_with_idf(words):
+
+    def idf(word):
+        return  df.shape[0] / (1 + (df.clean_lemmatized.str.contains(word)).sum())
+
+    # put the unique words into a data frame
+    idf_df = (pd.DataFrame(dict(word=words))
+    # calculate the idf for each word 
+    .assign(idf=lambda df: df.word.apply(idf))
+    # sort the data for presentation purposes
+    .set_index('word')
+    .sort_values(by='idf', ascending=False)
+    .head(5))
+    
+    return idf_df

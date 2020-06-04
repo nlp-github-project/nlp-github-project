@@ -5,15 +5,16 @@ For this project, you will be scraping data from GitHub repository README files.
 
 ## Executive Summary:
 
-* We found that the majority of the repo's we acquired were written in JavaScript. The second most popular language was Python, and the third was Java.
+* Acquired nearly 800 README’s from Github’s most starred repos
+* Broke the programming languages into 5 groups:
+    * Java
+    * Python
+    * JavaScript
+    * C++
+    * Other (for the other languages)
 
-* To help improve the accuracy scores of the models, we grouped languages that were not in the top 5 as `other`. 
-
-* We tested several models, and found that Decision Tree Classifier with a `max_depth` of 5, was the best model, with an accuracy score of ~65%.
-
-* We found that the majority of the readme's we relatively close i length
-
-* Python seemed to be the most verbose out of the programming languages
+* Found no significant patterns to help distinguish between programming languages
+* Using a machine learning algorithm called `Naive Bayes Multinomial` classifier we were able to predict the programming language with 71% accuracy
 
 ## How to Reproduce:
 - Have python installed through anaconda
@@ -26,7 +27,9 @@ For this project, you will be scraping data from GitHub repository README files.
      1. Go here and generate a personal access token https://github.com/settings/tokens
         You do _not_ need select any scopes, i.e. leave all the check boxes unchecked
      2. Save it in your env.py file under the variable `github_token`
--  Run acquire module in command line    
+     3. In another variable, called `github_username`, store your github username as a string.
+-  Run `repo_acquisition.py` in command line. This will will create a csv file called `repo_names.csv`. The repo's collected will be the same as the ones in the report.
+-  Run `acquire.py` module in command line. This will take the `repo_names.csv`, and create a new `data.json` file, which can be read using Pandas for analysis. This file will be needed to replicate the notebook.    
      
 ## Hypothesis
 - $𝐻_0$ : There is no significant difference between the mean word count of each language when compared with the mean word count of the group.

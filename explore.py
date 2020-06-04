@@ -65,15 +65,15 @@ def most_common_words(df):
     java_words = clean(' '.join(df[df.language == 'Java'].clean_lemmatized))
     c_plus_plus_words = clean(' '.join(df[df.language == 'C++'].clean_lemmatized))
     other_words = clean(' '.join(df[df.is_top_language == 'other'].clean_lemmatized))
-
+    c="#f7965cff"
     figure, axes = plt.subplots(1, 6)
-
-    pd.Series(all_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in all README', figsize=(19,10), ax=axes[0])
-    pd.Series(python_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in Python', figsize=(19,10), ax=axes[1])
-    pd.Series(javascript_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in JavaScript', figsize=(19,10), ax=axes[2])
-    pd.Series(java_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words Java', figsize=(19,10), ax=axes[3])
-    pd.Series(c_plus_plus_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words C++', figsize=(19,10), ax=axes[4])
-    pd.Series(other_words).value_counts().head(12).plot.barh(width=.9, ec='black', title='12 most common words in other languages', figsize=(19,10), ax=axes[5])
+    
+    pd.Series(all_words).value_counts().head(12).plot.barh(width=.9, ec='black', color = c, title='12 most common words in all README', figsize=(19,10), ax=axes[0])
+    pd.Series(python_words).value_counts().head(12).plot.barh(width=.9, ec='black',color = c, title='12 most common words in Python', figsize=(19,10), ax=axes[1])
+    pd.Series(javascript_words).value_counts().head(12).plot.barh(width=.9, ec='black',color = c, title='12 most common words in JavaScript', figsize=(19,10), ax=axes[2])
+    pd.Series(java_words).value_counts().head(12).plot.barh(width=.9, ec='black',color = c, title='12 most common words Java', figsize=(19,10), ax=axes[3])
+    pd.Series(c_plus_plus_words).value_counts().head(12).plot.barh(width=.9, ec='black',color = c, title='12 most common words C++', figsize=(19,10), ax=axes[4])
+    pd.Series(other_words).value_counts().head(12).plot.barh(width=.9, ec='black',color = c, title='12 most common words in other languages', figsize=(19,10), ax=axes[5])
 
     plt.tight_layout()
 
@@ -87,7 +87,7 @@ def plot_word_count_distribution(df):
     df["word_count"] = word_count
 
     plt.figure(figsize=(12,8))
-    sns.distplot(df.word_count)
+    sns.distplot(df.word_count, color="#f7965cff")
     plt.title("Word Count Distribution")
     
     
@@ -96,7 +96,7 @@ def plot_distro_for_value_counts_all(df):
     Creates a bar graph for the value counts of the readmes for all languages
     """
     
-    c="#84aae2"
+    c="#f7965cff"
     value_counts_all = pd.DataFrame(df.language.value_counts(ascending=False))
     plt.figure(figsize=(13,10))
     bar = sns.barplot(x=value_counts_all.index, y="language", data=value_counts_all, color = c)
@@ -111,7 +111,7 @@ def plot_distro_for_value_counts_top(df):
     """
     Creates a bar graph for the value counts of the readmes for top languages
     """
-    c="#84aae2"
+    c="#f7965cff"
     value_counts = pd.DataFrame(df.is_top_language.value_counts(ascending=False))
     plt.figure(figsize=(13,10))
     bar = sns.barplot(x=value_counts.index, y="is_top_language", data=value_counts, color = c)
@@ -150,7 +150,7 @@ def bargraphs_for_min_max_median(df):
     min_length = pd.DataFrame(df_length.groupby("language").length.min().sort_values(ascending= False))
 
 
-    c="#84aae2"
+    c="#f7965cff"
     plt.figure(figsize=(13,10))
     plt.title("What is the median length of readme files per language?")
     bar = sns.barplot(y=median_lengths.length,x=median_lengths.index, color=c)
@@ -269,7 +269,7 @@ def plot_bigrams(df):
     
     top_20_bigrams, top_20_js_bigrams, top_20_p_bigrams, top_20_j_bigrams, top_20_cpp_bigrams, top_20_other_bigrams= create_bigrams(df)
     
-    c="#84aae2"
+    c="#f7965cff"
 
     top_20_js_bigrams.sort_values().plot.barh(color=c, width=.9, figsize=(13, 10))
     plt.title('20 Most Frequently Occuring Java Script Bigrams')
